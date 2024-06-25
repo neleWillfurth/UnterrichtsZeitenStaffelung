@@ -212,7 +212,7 @@ def tab2_3():
 
 
 
-
+entry_travel_times=[]
 def tab3_4():
     notebook.select(tab4)
     anzahl_schulen_bus = int(entry_Anzahl_Haltestellen.get())
@@ -225,8 +225,9 @@ def tab3_4():
                         label_Traveltime.grid(column=0)
                         entry_Traveltime = ttk.Entry(scrollable_tab4.scrollable_frame)
                         entry_Traveltime.grid(column=1)
-                        travel_time = entry_Traveltime.get() + Spaetere_Ankuenfte[zielpunkt].get()
-                        Travel_times.append(travel_time)  # Speichere die Fahrzeit in der Liste
+                        entry_travel_times.append(entry_Traveltime)
+                        #travel_time = int(entry_Traveltime.get()) + Spaetere_Ankuenfte[zielpunkt].get()
+                        Travel_times.append(0)  # Speichere die Fahrzeit in der Liste
                         break
                 else:
                     Travel_times.append(100000000)
@@ -234,6 +235,11 @@ def tab3_4():
 
 def Berechnung_starten():
     notebook.select(tab5)
+    for i in range(len(Travel_times)):
+        if Travel_times[i]==0:
+            Travel_times[i]=int(entry_travel_times.pop(0).get())
+
+
     busses_needed_without = sum(int(entry.get()) for entry in n_ava)
     progress_var=0
     maximum=100#Zahl flexibel
@@ -280,13 +286,14 @@ def Berechnung_starten():
 
     i = 0
     for i in range(int(anzahl_schulen.get())):
-        if Haltestellennummern.count(i + 1) == 1:
-            index = Haltestellennummern.index(i + 1)
+        Haltestellennummern_int = [int(entry.get()) for entry in Haltestellennummern]
+        if Haltestellennummern_int.count(i + 1) == 1:
+            index = Haltestellennummern_int.index(i + 1)
             Busankunftszeit_Haltestelle.append(Busankunftszeiten_alle_schule_zulässig[index])
         else:
             ausgewählte_Busankunftszeiten = []
             for j, busankunftszeit in enumerate(Busankunftszeiten_alle_schule_zulässig):
-                if Haltestellennummern[j] == i + 1:
+                if Haltestellennummern_int[j] == i + 1:
                     ausgewählte_Busankunftszeiten.append(busankunftszeit)
             if ausgewählte_Busankunftszeiten:
                 # Berechne die Schnittmenge (Intersection) der ausgewählten Busankunftszeiten
@@ -298,6 +305,8 @@ def Berechnung_starten():
     matrizen = []
     schoolstart_combination = []
     combinations = list(itertools.product(*Busankunftszeit_Haltestelle))
+    n_ava_values = [int(entry.get()) for entry in n_ava]
+
 
     for combination in combinations:
         print("Current combination:", combination)
@@ -318,13 +327,13 @@ def Berechnung_starten():
                 print(f"combination[col]: {combination[col]}")
                 print(f"combination[zielpunkt]: {combination[zielpunkt]}")
 
-                if combination[col] + Travel_times[t] <= combination[zielpunkt]:
+                if int(combination[col]) + int(Travel_times[t]) <= int(combination[zielpunkt]):
                     matrix[row][col] = 1  # Hier wird das Element gesetzt, Beachte die Zeilen und Spalten vertauschen
                     print("+1")
                 t += 1
 
                 p += 1
-                if p == n_ava[zielpunkt]:
+                if p == n_ava_values[zielpunkt]:
                     print("zielpunkt vor Erhöhung:", zielpunkt)
                     zielpunkt += 1
                     p = 0
@@ -337,26 +346,25 @@ def Berechnung_starten():
     for matrix in matrizen:
         print('neuer Durchlauf')
         max_anfahrten = []
-        for i in range(len(n_ava)):
+        for i in range(len(n_ava_values)):
             max_anfahrten.append(0)
         n_reuse = 0
         n_ava_values = [int(entry.get()) for entry in n_ava]
-        n_ava_unverbraucht = n_ava_values .copy()
-        n_anfahrten = n_ava_values .copy()
+        n_ava_unverbraucht = n_ava_values.copy()
+        n_anfahrten = n_ava_values.copy()
         n_reuse_einzel = matrizenbearbeitung(matrix, n_ava_values, n_ava_unverbraucht, n_reuse, max_anfahrten, n_anfahrten)
         n_reuses.append(n_reuse_einzel)
 
     print(n_reuses)
 
-    while True:
-        Anzahl_Einwohner = input("Wie viele Menschen leben es im Untersuchungsgebiet? ")
-        if Anzahl_Einwohner.isdigit():
-            Anzahl_Einwohner = int(Anzahl_Einwohner)
-            break
+    Anzahl_Einwohner = int(entry_Anzahl_Bewohner.get())
 
     Teiler = 83300000 / Anzahl_Einwohner
     Busse_hohes_Einsparpotenzial = int(19600 * 1.15 / Teiler) + 1
     print(Busse_hohes_Einsparpotenzial)
+
+
+
 
     max_reuses = max(n_reuses)
 
@@ -374,11 +382,32 @@ def Berechnung_starten():
 
 
 
-    for i in range (100): # hier muss die entsprechende Anzahl aller durchläufe stehen
-        progress_var=(i+1)*100/200#hier muss entsprechende Zahl sthen
-        tab5.update_idletasks()
-    if progress_var==maximum:
-        notebook.select(tab6)
+
+
+    Gesamtmittelwerte = []
+
+    print(Busankunftszeit_Haltestelle)
+
+
+    print(merkmalsliste)
+    notebook.select(tab6)
+    # Tab6
+    label_anzahl_ohne_Staffelung=ttk.Label(scrollable_tab6.scrollable_frame, text=f"Ohne Staffelung der Unterrichtszeiten werden {busses_needed_without} Busse benötigt")
+    label_anzahl_ohne_Staffelung.grid()
+    label_maximale_Einsparung = ttk.Label(scrollable_tab6.scrollable_frame,text=f"Es können maximal {max(n_reuses)}Busse eingespart werden")
+    label_maximale_Einsparung.grid()
+    label_hohe_Einsparung = ttk.Label(scrollable_tab6.scrollable_frame,text=f"Ein hohes Einsparpotenzial wird ab{Busse_hohes_Einsparpotenzial} erreicht")
+    label_hohe_Einsparung.grid()
+    Var = []
+    Durchläufe = 0
+    # Ausgabe der Ergebnisse für die restlichen höchsten Werte
+    for Durchläufe in range(max_reuses - Busse_hohes_Einsparpotenzial + 1):
+        label_Einsparungen=ttk.Label(scrollable_tab6.scrollable_frame,text=f"Mit folgenden Varianten werden {max_reuses - Durchläufe} Busse gespart")
+        label_Einsparungen.grid()
+        for q in indices_of_values[Durchläufe]:
+            label_Kombinationen=ttk.Label(scrollable_tab6.scrollable_frame, text= f"{schoolstart_combination[q]}")
+            label_Kombinationen.grid()
+            Var.append(schoolstart_combination[q])
 
 
 
@@ -417,6 +446,10 @@ button_nächster_Tab3.grid(column=2, row=3, padx=5, pady=5)
 # Tab4
 Berechnung_starten = ttk.Button(scrollable_tab4.scrollable_frame, text="Berechnung starten", command=Berechnung_starten)
 Berechnung_starten.grid(column=2, row=3, padx=5, pady=5)
+
+
+
+
 
 # Hauptfenster ausführen
 root.mainloop()
