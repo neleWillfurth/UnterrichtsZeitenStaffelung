@@ -1,3 +1,4 @@
+# importieren von Biblotheken
 import tkinter as tk
 from tkinter import ttk
 import itertools
@@ -8,6 +9,9 @@ import csv
 import pandas
 import statistics
 import numpy
+from collections import Counter
+
+
 d=pandas.read_csv('Daten_rating_system2.csv', sep=';')
 
 # Hauptfenster erstellen
@@ -41,7 +45,8 @@ class ScrollableFrame(ttk.Frame):
     def __init__(self, container):
         super().__init__(container)
         canvas = tk.Canvas(self)
-        scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
+
+        self.scrollbar = ttk.Scrollbar(self, orient="vertical", command=canvas.yview)
         self.scrollable_frame = ttk.Frame(canvas)
 
         self.scrollable_frame.bind(
@@ -53,10 +58,10 @@ class ScrollableFrame(ttk.Frame):
 
         canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
 
-        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.configure(yscrollcommand=self.scrollbar.set)
 
         canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
+        self.scrollbar.pack(side="right", fill="y")
 
 
 # Erstellen eines scrollbaren Rahmens für jedes Tab
@@ -84,7 +89,7 @@ n_reuse = 0
 n_reuses = []
 starts = []
 startzeiten = []
-Startzeiten_aktuell = []
+aktueller_unterrichtsbeginn_alle_Schulen_entries = []
 entry_aktueller_Schulbeginn = 0
 Haltestellennummern=[]
 Weg_Bus_Schule= []
@@ -95,7 +100,7 @@ check_var_liste2=[]
 check_var_liste3=[]
 check_var_liste4=[]
 check_var_liste5=[]
-
+checkbuttons = []
 Schüleranzahlen=[]
 Gesamtmittelwerte =[]
 
@@ -103,8 +108,8 @@ def validate_and_submit():
     results = []
 
     try:
-        # Überprüfen, ob alle Elemente in Startzeiten_aktuell durch 5 teilbar sind
-        if all(isinstance(x, (int, float)) and x % 5 == 0 for x in[int(entry.get()) for entry in Startzeiten_aktuell]):
+        # Überprüfen, ob alle Elemente in aktueller_unterrichtsbeginn_alle_Schulen_entries durch 5 teilbar sind
+        if all(isinstance(x, (int, float)) and x % 5 == 0 for x in[int(entry.get()) for entry in aktueller_unterrichtsbeginn_alle_Schulen_entries]):
             results.append(True)
         else:
             results.append(False)
@@ -125,16 +130,16 @@ def validate_and_submit():
     except Exception as e:
         label_fehler = ttk.Label(scrollable_tab2.scrollable_frame, text="Die Eingabe war ungültig - bitte ändern sie die Zahlen")
         label_fehler.grid()
-        del Startzeiten_aktuell[:]
-        del Spaetere_Ankuenfte[:]
-        del Weg_Bus_Schule[:]
+        #del aktueller_unterrichtsbeginn_alle_Schulen_entries[:]
+        #del Spaetere_Ankuenfte[:]
+        #del Weg_Bus_Schule[:]
 
     if not all (result for result in results):
         label_fehler = ttk.Label(scrollable_tab2.scrollable_frame,text="Die Eingabe war ungültig - bitte ändern sie die Zahlen")
         label_fehler.grid(column=1,row=5)
-        del Startzeiten_aktuell[:]
-        del Spaetere_Ankuenfte[:]
-        del Weg_Bus_Schule[:]
+        #del aktueller_unterrichtsbeginn_alle_Schulen_entries[:]
+        #del Spaetere_Ankuenfte[:]
+        #del Weg_Bus_Schule[:]
     else:
         label_fehler = ttk.Label(scrollable_tab2.scrollable_frame,text="Die Eingabe war gültig")
         label_fehler.grid(column=1,row=5)
@@ -146,7 +151,7 @@ def validate_and_submit():
 # Funktionen zum Wechseln der Tabs
 
 
-def tab1_2():
+def wechsel_tab1_tab2():
     notebook.select(tab2)
 
     anzahl_Schulen = int(entry_Anzahl_Schulen.get())
@@ -168,8 +173,7 @@ def tab1_2():
         label_aktueller_Schulbeginn.grid()
         entry_aktueller_Schulbeginn = ttk.Entry(scrollable_tab2.scrollable_frame)
         entry_aktueller_Schulbeginn.grid()
-        Startzeiten_aktuell.append(entry_aktueller_Schulbeginn)
-
+        aktueller_unterrichtsbeginn_alle_Schulen_entries.append(entry_aktueller_Schulbeginn)
 
         label_Haltestellennutzung = tk.Label(scrollable_tab2.scrollable_frame,text="Welche Haltestelle nutzt die Schule? - Bitte die Angabe als Zahl eintragen "
                                                                                    "und darauf achten, dass Schulen, die die selbe Haltestelle nutzen oder direkt nacheinander angefahren werden"
@@ -202,39 +206,43 @@ def tab1_2():
         label_Betreuungsangebot_morgens.grid()
         checkbutton_Betreuung_morgens = ttk.Checkbutton(scrollable_tab2.scrollable_frame, text="Ja",variable=check_var_liste1[i])
         checkbutton_Betreuung_morgens.grid()
+        checkbuttons.append(checkbutton_Betreuung_morgens)
 
         label_Betreuungsangebot_mittags = ttk.Label(scrollable_tab2.scrollable_frame,text="Gibt es an dieser Schule ein Betreuungsangebot nach Unterrichtsende?")
         label_Betreuungsangebot_mittags.grid()
         checkbutton_Betreuung_mittags = ttk.Checkbutton(scrollable_tab2.scrollable_frame, text="Ja",variable=check_var_liste2[i])
         checkbutton_Betreuung_mittags.grid()
+        checkbuttons.append(checkbutton_Betreuung_mittags)
 
         label_Mensa = ttk.Label(scrollable_tab2.scrollable_frame, text="Gibt es eine Mensa an dieser Schule?")
         label_Mensa.grid()
         checkbutton_Mensa = ttk.Checkbutton(scrollable_tab2.scrollable_frame, text="Ja",variable=check_var_liste3[i])
         checkbutton_Mensa.grid()
+        checkbuttons.append(checkbutton_Mensa)
 
         label_andere_Lehrer = ttk.Label(scrollable_tab2.scrollable_frame, text= "Gibt es an dieser Schule auch Lehrer, die an anderen Schulen unterrichten?")
         label_andere_Lehrer.grid()
         checkbutton_andere_Lehrer = ttk.Checkbutton(scrollable_tab2.scrollable_frame, text="Ja",variable=check_var_liste4[i])
         checkbutton_andere_Lehrer.grid()
+        checkbuttons.append(checkbutton_andere_Lehrer)
 
         label_andere_Schüler = ttk.Label(scrollable_tab2.scrollable_frame,text="Gibt es an dieser Schule Schüler, die auch Fächer an anderen Schulen besuchen?")
         label_andere_Schüler.grid()
         checkbutton_andere_Schüler = ttk.Checkbutton(scrollable_tab2.scrollable_frame, text="Ja",variable=check_var_liste5[i])
         checkbutton_andere_Schüler.grid()
+        checkbuttons.append(checkbutton_andere_Schüler)
 
-    validate_button = ttk.Button(scrollable_tab2.scrollable_frame, text="Eingaben überprüfen", command=validate_and_submit)
-    validate_button.grid(column=1, row=4)
+
 
 
 def s_merkmale_füllen():
     anzahl_Schulen = int(entry_Anzahl_Schulen.get())
-    Startzeiten_aktuell_int  = []
-    Startzeiten_aktuell_int = [int(entry.get()) for entry in Startzeiten_aktuell]
+    aktueller_unterrichtsbeginn_alle_Schulen_entries_int  = []
+    aktueller_unterrichtsbeginn_alle_Schulen_entries_int = [int(entry.get()) for entry in aktueller_unterrichtsbeginn_alle_Schulen_entries]
     Schüleranzahlen_int = [int(entry.get()) for entry in Schüleranzahlen]
     for i in range(anzahl_Schulen):
         s_merkmale=[]
-        s_merkmale.append(Startzeiten_aktuell_int[i])
+        s_merkmale.append(aktueller_unterrichtsbeginn_alle_Schulen_entries_int[i])
 
         if Schüleranzahlen_int[i] < 300:
             s_merkmale.append(1)
@@ -271,13 +279,30 @@ def s_merkmale_füllen():
             s_merkmale.append(0)
         merkmalsliste.append(s_merkmale)
 
-    button_nächster_Tab2.configure(state=tk.NORMAL)
+    merkmale_füllen.configure(state=tk.DISABLED)
+    button_eingabe_prüfen.configure(state=tk.DISABLED)
+    button_wechsel_tab2_tab3.configure(state=tk.NORMAL)
+    for startzeiten_entery in aktueller_unterrichtsbeginn_alle_Schulen_entries:
+        startzeiten_entery.config(state="disabled")
+
+    for weg_Bus_Schule_entry in Weg_Bus_Schule:
+        weg_Bus_Schule_entry.config(state="disabled")
+
+    for spaetere_Ankuenfte_entry in Spaetere_Ankuenfte:
+        spaetere_Ankuenfte_entry.config(state="disabled")
+
+    for haltestellennummern_entry in Haltestellennummern:
+        haltestellennummern_entry.config(state="disabled")
+
+    for schüleranzahlen_entry in Schüleranzahlen:
+        schüleranzahlen_entry.config(state="disabled")
+
+    for checkbutton in checkbuttons:
+        checkbutton.config(state="disabled")
 
 
 
-
-
-def tab2_3():
+def wechsel_tab2_tab3():
     notebook.select(tab3)
     anzahl_schulen_bus = int(entry_Anzahl_Haltestellen.get())
     for i in range(anzahl_schulen_bus):
@@ -293,7 +318,7 @@ def tab2_3():
 
 
 entry_travel_times=[]
-def tab3_4():
+def wechsel_tab3_tab4():
     notebook.select(tab4)
     anzahl_schulen_bus = int(entry_Anzahl_Haltestellen.get())
     label_Erklärung = ttk.Label(scrollable_tab4.scrollable_frame, text="Die Fahrzeit von einer Schule zum Startpunkt einer Route zu einer anderen Route muss mit einem Navigator ermittelt werden."
@@ -332,7 +357,7 @@ def Berechnung_starten():
     Busankunftszeiten_alle_Schulen_aktuell = []
 
     for i in range(int(anzahl_schulen.get())):
-        Busankunft_aktuell = int(Startzeiten_aktuell[i].get()) - int(Spaetere_Ankuenfte[i].get()) - int(Weg_Bus_Schule[i].get())
+        Busankunft_aktuell = int(aktueller_unterrichtsbeginn_alle_Schulen_entries[i].get()) - int(Spaetere_Ankuenfte[i].get()) - int(Weg_Bus_Schule[i].get())
         Busankunftszeiten_alle_Schulen_aktuell.append(Busankunft_aktuell)
 
     # Hier wird für jede Schule gespeichert, in welchem Zeitkorridor der Bus an der Planungshaltestelle ankommen muss
@@ -340,17 +365,17 @@ def Berechnung_starten():
     print("Busankunftszeiten_alle_Schulen_aktuell", Busankunftszeiten_alle_Schulen_aktuell)
     Busankunftszeiten_alle_schule_zulässig = []
     for i in range(int(anzahl_schulen.get())):
-        Busankunft_aktuell = Startzeiten_aktuell[i]
+        Busankunft_aktuell = aktueller_unterrichtsbeginn_alle_Schulen_entries[i]
         Startzeiten_Korridor_zulässig = []
 
-        if int(Startzeiten_aktuell[i].get()) < 40:
+        if int(aktueller_unterrichtsbeginn_alle_Schulen_entries[i].get()) < 40:
             Startzeiten_Korridor_zulässig.extend(
                 [Busankunftszeiten_alle_Schulen_aktuell[i], Busankunftszeiten_alle_Schulen_aktuell[i] + 5,
                  Busankunftszeiten_alle_Schulen_aktuell[i] + 10, Busankunftszeiten_alle_Schulen_aktuell[i] + 15,
                  Busankunftszeiten_alle_Schulen_aktuell[i] + 20, Busankunftszeiten_alle_Schulen_aktuell[i] + 25,
                  Busankunftszeiten_alle_Schulen_aktuell[i] + 30, Busankunftszeiten_alle_Schulen_aktuell[i] + 35,
                  Busankunftszeiten_alle_Schulen_aktuell[i] + 40])
-        elif int(Startzeiten_aktuell[i].get()) >= 40 and int(Startzeiten_aktuell[i].get()) < 55:
+        elif int(aktueller_unterrichtsbeginn_alle_Schulen_entries[i].get()) >= 40 and int(aktueller_unterrichtsbeginn_alle_Schulen_entries[i].get()) < 55:
             Startzeiten_Korridor_zulässig.extend(
                 [Busankunftszeiten_alle_Schulen_aktuell[i] - 10, Busankunftszeiten_alle_Schulen_aktuell[i] - 5,
                  Busankunftszeiten_alle_Schulen_aktuell[i], Busankunftszeiten_alle_Schulen_aktuell[i] + 5,
@@ -425,7 +450,7 @@ def Berechnung_starten():
         matrizen.append(matrix)
         schoolstart_combination.append(combination)
 
-    from Matrizenbearbeitung_GUI import matrizenbearbeitung
+
     for matrix in matrizen:
         print('neuer Durchlauf')
         max_anfahrten = []
@@ -440,7 +465,7 @@ def Berechnung_starten():
 
     print(n_reuses)
 
-    Anzahl_Einwohner = int(entry_Anzahl_Bewohner.get())
+    Anzahl_Einwohner = int(entry_anzahl_bewohner.get())
 
     Teiler = 83300000 / Anzahl_Einwohner
     Busse_hohes_Einsparpotenzial = int(19600 * 1.15 / Teiler) + 1
@@ -492,23 +517,37 @@ def Berechnung_starten():
             label_Kombinationen.grid()
             Var.append(schoolstart_combination[q])
 
-            Unterrichtsbeginn=[]
-            Busankunft_Liste_Alle_Schulen= []
-
+            Busankunft_Liste_Alle_Schulen_Kombinationen= []
+            Unterrichtsbeginn_Kombinationen= []
             for i, inner_list in enumerate(schoolstart_combination):
-                nummer = i + 1  # Nummern basieren auf dem Index
-                anzahl = int(Haltestellennummern.get()).count(nummer)
+                #nummer = i + 1  # Nummern basieren auf dem Index
+                #anzahl = int(Haltestellennummern.get()).count(nummer)
+                #[int(haltestellennummernEntery.get()) for haltestellennummernEntery in Haltestellennummern]
+                #item_counts = Counter([haltestellennummernEntery.get() for haltestellennummernEntery in Haltestellennummern])
+
 
                 # Füge die Elemente der inneren Liste so oft zur Zielliste hinzu, wie die Anzahl der Nummern
-                for _ in range(anzahl):
-                    Busankunft_Liste_Alle_Schulen.extend(inner_list)
+                Busankunft_Liste_Alle_Schulen= []
+                Unterrichtsbeginn = []
 
-            print(Busankunft_Liste_Alle_Schulen)
-            for i in range (int(entry_Anzahl_Schulen.get())):
-                Unterrischtsbeginn_1_Schule = int(Weg_Bus_Schule[i].get())+int(Spaetere_Ankuenfte[i].get())+int(Busankunft_Liste_Alle_Schulen[i].get())
-                Unterrichtsbeginn.append(Unterrischtsbeginn_1_Schule)
+                for schule in range(int(anzahl_schulen.get())):
+                    haltestelle = Haltestellennummern_int[schule] -1
+                    ankunftszeit = inner_list[haltestelle]
+                    Busankunft_Liste_Alle_Schulen.append(ankunftszeit)
+                    Unterrichtsbeginn_Aktuelle_Schule = int(Weg_Bus_Schule[schule].get())+int(Spaetere_Ankuenfte[schule].get())+ankunftszeit
+                    Unterrichtsbeginn.append(Unterrichtsbeginn_Aktuelle_Schule)
 
-            label_Unterrichtsbeginn=ttk.Label(scrollable_tab6.scrollable_frame, text=f"Unterrichtsbeginn an den Schulen: {Unterrichtsbeginn}")
+                Busankunft_Liste_Alle_Schulen_Kombinationen.append(Busankunft_Liste_Alle_Schulen)
+                Unterrichtsbeginn_Kombinationen.append(Unterrichtsbeginn)
+
+            print(Busankunft_Liste_Alle_Schulen_Kombinationen)
+            print(Unterrichtsbeginn_Kombinationen)
+
+            #for i in range (int(entry_Anzahl_Schulen.get())):
+            #   Unterrischtsbeginn_1_Schule = int(Weg_Bus_Schule[i].get())+int(Spaetere_Ankuenfte[i].get())+int(Busankunft_Liste_Alle_Schulen[i]))
+            #    Unterrichtsbeginn.append(Unterrischtsbeginn_1_Schule)
+
+            label_Unterrichtsbeginn=ttk.Label(scrollable_tab6.scrollable_frame, text=f"Unterrichtsbeginn an den Schulen: {Unterrichtsbeginn_Kombinationen[q]}")
             label_Unterrichtsbeginn.grid()
 
 
@@ -522,7 +561,7 @@ def Akzeptanzbewertung_anzeigen():
         anzahl_schulen=int(entry_Anzahl_Schulen.get())
         for i in range(anzahl_schulen):
             index = int(Haltestellennummern[i].get())
-            s_change = Variante[index - 1] + int(Spaetere_Ankuenfte[i].get()) + int(Weg_Bus_Schule[i].get()) - int(Startzeiten_aktuell[i].get())
+            s_change = Variante[index - 1] + int(Spaetere_Ankuenfte[i].get()) + int(Weg_Bus_Schule[i].get()) - int(aktueller_unterrichtsbeginn_alle_Schulen_entries[i].get())
             s_change_values.append(s_change)
         print(s_change_values)
 
@@ -1044,32 +1083,34 @@ label_Anzahl_Haltestellen_Erklärung.grid(column=0, row=3)
 entry_Anzahl_Haltestellen = ttk.Entry(scrollable_tab1.scrollable_frame, textvariable=Anzahl_Haltestellen_entry_value)
 entry_Anzahl_Haltestellen.grid(column=0, row=4, padx=5, pady=5)
 
-Anzahl_Bewohner_entry_value = tk.StringVar(value="0")
-label_Anzahl_Bewohner = ttk.Label(scrollable_tab1.scrollable_frame, text="Anzahl Bewohner im Untersuchungsgebiet",  font=("Helvetica",10, "bold"))
-label_Anzahl_Bewohner.grid(column=0, row=5, padx=5, pady=5)
-entry_Anzahl_Bewohner = ttk.Entry(scrollable_tab1.scrollable_frame, textvariable=Anzahl_Bewohner_entry_value)
-entry_Anzahl_Bewohner.grid(column=0, row=6, padx=5, pady=5)
+anzahl_bewohner_entry = tk.StringVar(value="0")
+label_anzahl_bewohner = ttk.Label(scrollable_tab1.scrollable_frame, text="Anzahl Bewohner im Untersuchungsgebiet",  font=("Helvetica",10, "bold"))
+label_anzahl_bewohner.grid(column=0, row=5, padx=5, pady=5)
+entry_anzahl_bewohner = ttk.Entry(scrollable_tab1.scrollable_frame, textvariable=anzahl_bewohner_entry)
+entry_anzahl_bewohner.grid(column=0, row=6, padx=5, pady=5)
 
-button_nächster_Tab1 = ttk.Button(scrollable_tab1.scrollable_frame, text="Nächster Schritt", command=tab1_2)
+button_wechsel_tab1_tab2= ttk.Button(scrollable_tab1.scrollable_frame, text="Nächster Schritt", command=wechsel_tab1_tab2)
 button_nächster_Tab1.grid(column=1, row=0, padx=5, pady=5)
 
 # Tab2
+button_eingabe_prüfen = ttk.Button(scrollable_tab2.scrollable_frame, text="Eingaben überprüfen", command=validate_and_submit)
+button_eingabe_prüfen.grid(column=1, row=4)
 merkmale_füllen= ttk.Button(scrollable_tab2.scrollable_frame, text="Werte eingetragen",command=s_merkmale_füllen, state=tk.DISABLED)
 merkmale_füllen.grid(column=2, row=4)
-button_nächster_Tab2 = ttk.Button(scrollable_tab2.scrollable_frame, text="Nächster Schritt", command=tab2_3, state=tk.DISABLED)
-button_nächster_Tab2.grid(column=3, row=4, padx=5, pady=5)
+button_wechsel_tab2_tab3 = ttk.Button(scrollable_tab2.scrollable_frame, text="Nächster Schritt", command=wechsel_tab2_tab3, state=tk.DISABLED)
+button_wechsel_tab2_tab3.grid(column=3, row=4, padx=5, pady=5)
 
 # Tab3
-button_nächster_Tab3 = ttk.Button(scrollable_tab3.scrollable_frame, text="Nächster Schritt", command=tab3_4)
-button_nächster_Tab3.grid(column=2, row=3, padx=5, pady=5)
+button_wechsel_tab3_tab4 = ttk.Button(scrollable_tab3.scrollable_frame, text="Nächster Schritt", command=wechsel_tab3_tab4)
+button_wechsel_tab3_tab4.grid(column=2, row=3, padx=5, pady=5)
 
 # Tab4
 Berechnung_starten = ttk.Button(scrollable_tab4.scrollable_frame, text="Berechnung starten", command=Berechnung_starten)
 Berechnung_starten.grid(column=2, row=3, padx=5, pady=5)
 
 #Tab6
-Akzeptanz_ergebnis_anzeigen =ttk.Button(scrollable_tab6.scrollable_frame, text="Akzeptanzbewertung anzeigen", command=Akzeptanzbewertung_anzeigen)
-Akzeptanz_ergebnis_anzeigen.grid()
+button_akzeptanzbewertung_anzeigen =ttk.Button(scrollable_tab6.scrollable_frame, text="Akzeptanzbewertung anzeigen", command=Akzeptanzbewertung_anzeigen)
+button_akzeptanzbewertung_anzeigen.grid()
 
 
 
