@@ -8,7 +8,7 @@ def schulcharakteristika_eingeben(entry_anzahl_schulen, scrollable_tab2,
                                   checkbuttons, check_var_liste1, check_var_liste2, check_var_liste3, check_var_liste4,
                                   check_var_liste5):
     """
-    Erstellung jener entry- und checkbuttonfelder, um Schulcharakterstiken einzugeben
+    Erstellung jener entry- und checkbuttonfelder, um Schulen zu charakterisieren
 
 
     :param entry_anzahl_schulen: bestimmt wie oft ein entry- /checkbuttonfeld erstellt wird (für jede Schule wird jedes
@@ -24,7 +24,7 @@ def schulcharakteristika_eingeben(entry_anzahl_schulen, scrollable_tab2,
     :param wegdauern_haltestelle_schule: gibt die benötigte Zeit zwischen Busankunft und Unterrichtsbeginn je
     Schule an
     :param schüleranzahlen: Eines der Schulcharakteristika, Schüleranzahl je Schule wird in Liste gespeichert
-    :param checkbuttons: liste aus checkbuttons, um anzukreuzen, ob es etwas an einer bestimmten Schule gibt
+    :param checkbuttons: liste aus checkbuttons
     :param check_var_liste1: speichert, die Eingaben je Schule für den ersten Checkbutton, ob die Schule eine Betreuung
     vor Unterrichtsbeginn anbietet
     :param check_var_liste2: speichert, die Eingaben je Schule für den zweiten Checkbutton, ob die Schule eine Betreuung

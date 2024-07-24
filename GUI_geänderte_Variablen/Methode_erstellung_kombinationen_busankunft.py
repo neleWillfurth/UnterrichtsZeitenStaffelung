@@ -5,7 +5,10 @@ def erstellung_kombination_busankunft(anzahl_schulen, aktueller_unterrichtsbegin
                                       versatz_ankunft_anschlussfahrt, wegdauern_haltestelle_schule,
                                       haltestellennummern_alle_schulen):
     """
-    Erstellung aller Kombinationen an Busankunftszeiten an den Haltestellen, die prinzipiell zulässig sind
+    Erstellt alle Kombinationen an zulässigen Busankunftszeiten je Haltestelle. Basierend auf den aktuellen
+    Unterrichtsbgeinnzeiten der Schulen wird für jede Haltestelle ein zulässiges Fenster zur Busankunft bestimmt. Zudem
+    wird festgelegt, dass die Busankunftszeit ein Vielfaches von 5 sein muss. Aus diesen zulässigen Zeiten je
+    Haltestelle werden dann alle Kombinationsmöglichkeiten erstellt
 
     :param anzahl_schulen: ermöglicht es die for-Schleifen für jede Schule einmal durchzuführen
     :param aktueller_unterrichtsbeginn_alle_schulen:

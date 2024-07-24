@@ -4,7 +4,7 @@ from tkinter import ttk
 def fahrzeiten_eintragen(entry_anzahl_haltestellen, anzahl_busse_je_haltestelle, scrollable_tab4,
                          entry_fahrzeiten, fahrzeiten):
     """
-    Eingabe der Fahrzeit für alle möglichen Fahrtrelationen
+    Eingabe der Fahrzeiten für alle möglichen Fahrtrelationen
     :param entry_anzahl_haltestellen: Anzahl Haltestellen im Untersuchungsgebiet
     :param anzahl_busse_je_haltestelle: je Haltestelle wird angegebenen, wie viele Busse dort hinfahren
     :param scrollable_tab4: tab in welchem die Felder dargestellt werden
@@ -29,8 +29,9 @@ def fahrzeiten_eintragen(entry_anzahl_haltestellen, anzahl_busse_je_haltestelle,
                     entry_fahrzeit.grid(column=0)
                     # die eingegebenen Fahrzeiten werden in entry_fahrzeiten
                     entry_fahrzeiten.append(entry_fahrzeit)
-                    # für alle Relationen bei denen start- und zielpunkt identisch sind, wird in der Liste fahrzeiten
-                    # eine 0 ergänzt, um diese später systematisch zu ersetzten
+                    # für alle Relationen bei denen start- und zielpunkt nicht identisch sind, wird in der Liste
+                    # fahrzeiten eine 0 ergänzt, um diese später systematisch mit den Werten aus
+                    # entry_fahrzeiten zu ersetzten
                     fahrzeiten.append(0)
                 else:
                     # sind start- und zielpunkt identisch wird dort eine sehr hohe Zahl als Fahrzeit eingegeben, um

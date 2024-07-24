@@ -1,8 +1,10 @@
 def matrizenerstellung(zulässige_kombinationen_busankünfte, entry_anzahl_haltestellen, anzahl_busse_ohne_staffelung,
                        fahrzeiten, anzahl_busse_je_haltestelle_int):
     """
-    für jede zulässige Kombination an Busankunftszeiten wird eine Matrix erstellt. Diese erhält eine 1, wenn eine
-    entsprechende Anschlussfahrt möglich ist und eine 0, wenn dies nicht möglich ist
+    für jede zulässige Kombination an Busankunftszeiten wird eine Matrix erstellt. Für jede Zelle der Matrix wird
+    geprüft, ob eine Anschlussfahrt möglich ist. Wenn eine entsprechende Anschlussfahrt möglich ist, wird eine 1 in die
+     Zelle geschrieben. Für Routen zwischen Startpunkt und Zielpunkt, welche nicht als Anschlussfahrt gefahren werden
+     können, bleibt eine 0 in der Zelle stehen
     :param zulässige_kombinationen_busankünfte: Liste aus einer Liste mit allen gültigen Busankunftszeiten (basierend
     auf der Methode erstellung_kombination_busankunft)
     :param entry_anzahl_haltestellen: wird benötigt, um für jede Haltestelle eine Spalte in der Matrix zu erstellen

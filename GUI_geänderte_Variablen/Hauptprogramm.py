@@ -80,7 +80,7 @@ scrollable_tab5.pack(expand=1, fill='both')
 scrollable_tab6.pack(expand=1, fill='both')
 
 
-# Globale Listen und Variablen
+# Globale Listen definieren
 # Listen mit Werten für alle Schulen
 aktueller_unterrichtsbeginn_alle_schulen = []  # beinhaltet den aktuellen Schulbeginn für jede Schule
 haltestellennummern_alle_schulen = []  # beinhaltet die Haltestellennummer für jede Schule
