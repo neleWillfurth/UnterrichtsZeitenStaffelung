@@ -22,7 +22,7 @@ def fahrzeiten_eintragen(entry_anzahl_haltestellen, anzahl_busse_je_haltestelle,
                 if startpunkt != zielpunkt:
                     label_fahrzeit = ttk.Label(scrollable_tab4.scrollable_frame,
                                                text=f"Fahrzeit von Haltestelle {startpunkt + 1} "
-                                                    f"über den Routenstart {routenstart + 1} Haltestelle"
+                                                    f"über den Routenstart {routenstart + 1} zu Haltestelle"
                                                     f" {zielpunkt + 1} ", font=("Helvetica", 10))
                     label_fahrzeit.grid(column=0)
                     entry_fahrzeit = ttk.Entry(scrollable_tab4.scrollable_frame)

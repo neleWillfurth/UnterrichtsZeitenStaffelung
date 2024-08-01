@@ -93,9 +93,10 @@ def matrizenbearbeitung(matrix, anzahl_busse_pro_haltestelle_liste, anzahl_busse
 
         index = 0
         while len(anzahl_busse_pro_haltestelle_liste) > index:
-            # Wenn eine Anschlussfahrt von einem Routenstart zu einem Zielpunkt erfolgt ist, muss die Zeile komplett auf
-            # 0 gesetzt werden, damit diese Fahrt nicht nochmal als Anschlussfahrt berechnet wird, da jede
-            # Anschlussfahrt, ja nur einmal benötigt wird
+            # Wenn bei einer Schule die Zählvariable 0 erreicht, wird diese Spalte auf 0 gesetzt (durch die Zeilen 62-88
+            # wird sichergestellt, dass keine möglichen Wiedernutzungen nicht berücksichtigt werden, bevor die Spalte
+            # auf 0 gesetzt wird. Durch dieses auf 0 setzten, wird der Prozess am Laufen gehalten, da es nun neue Zeilen
+            # gibt, die eine Zeilensumme von 1 haben (Z. 29)
             if anzahl_busse_pro_haltestelle_liste[index] == 0:
                 for row in matrix:
                     row[index] = 0
